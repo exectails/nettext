@@ -39,6 +39,7 @@ namespace nettext
 		/// </summary>
 		public PoFile()
 		{
+			this.Init();
 		}
 
 		/// <summary>
