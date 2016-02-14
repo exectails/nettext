@@ -273,9 +273,9 @@ namespace nettext
 		/// </example>
 		private void LoadPluralEvaluator(string pluralForms)
 		{
-			var match = Regex.Match(pluralForms, @"^nplurals=(?<nplurals>[0-9]+);\s*plural=(?<plural>[^;]+);?$");
+			var match = Regex.Match(pluralForms, @"^nplurals=(?<nplurals>[0-9]+);\s*plural=(?<plural>[0-9n\?:\(\)!=\s%<>|&]+);?$");
 			if (!match.Success)
-				throw new ArgumentException("Invalid Plural-Forms value.");
+				throw new ArgumentException("Invalid Plural-Forms value: " + pluralForms);
 
 			// Read number and rules
 			_nplurals = Convert.ToInt32(match.Groups["nplurals"].Value);
