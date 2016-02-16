@@ -132,7 +132,7 @@ namespace nettext
 		{
 			this.Init();
 
-			var regex = new Regex(@"""(.*)""", RegexOptions.Compiled);
+			var regex = new Regex(@"""(.*)""", RegexOptions.Compiled | RegexOptions.Singleline);
 			var regex2 = new Regex(@"^msgstr\[([0-9]+)\]", RegexOptions.Compiled);
 
 			var message = new Message();
