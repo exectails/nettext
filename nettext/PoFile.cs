@@ -211,6 +211,7 @@ namespace nettext
 			str = str.Replace("\\t", "\t");
 			str = str.Replace("\\r\\n", "\r\n");
 			str = str.Replace("\\n", "\n");
+			str = str.Replace("\\\"", "\"");
 
 			return str;
 		}
