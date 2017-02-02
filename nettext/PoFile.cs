@@ -283,6 +283,14 @@ namespace nettext
 			_nplurals = Convert.ToInt32(match.Groups["nplurals"].Value);
 			_plural = match.Groups["plural"].Value;
 
+			// Check for known evaluators
+			var knownEvaluator = DefaultPluralEvaluator.GetKnownEvaluator(pluralForms);
+			if (knownEvaluator != null)
+			{
+				_pluralEvaluator = knownEvaluator;
+				return;
+			}
+
 			// Create script
 			var script = @"
 				using System;
