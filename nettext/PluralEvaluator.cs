@@ -15,18 +15,40 @@ using System;
 
 namespace nettext
 {
+	/// <summary>
+	/// Interface all plural evaluators implement.
+	/// </summary>
 	public interface IPluralEvaluator
 	{
+		/// <summary>
+		/// Evaluates the given number and returns the plural form for it.
+		/// </summary>
+		/// <param name="n"></param>
+		/// <returns></returns>
 		int Eval(int n);
 	}
 
+	/// <summary>
+	/// Default evaluator, using the English plural rule.
+	/// </summary>
 	public class DefaultPluralEvaluator : IPluralEvaluator
 	{
+		/// <summary>
+		/// Evaluates the given number and returns the plural form for it.
+		/// </summary>
+		/// <param name="n"></param>
+		/// <returns></returns>
 		public int Eval(int n)
 		{
 			return (n != 1 ? 1 : 0);
 		}
 
+		/// <summary>
+		/// Returns a plural evaluator if one is available for the given
+		/// plural, otherwise it returns null.
+		/// </summary>
+		/// <param name="pluralForms"></param>
+		/// <returns></returns>
 		public static IPluralEvaluator GetKnownEvaluator(string pluralForms)
 		{
 			pluralForms = pluralForms.Replace(" ", "");
@@ -56,6 +78,9 @@ namespace nettext
 			return null;
 		}
 	}
+
+	// These evaluators are the only ones needed for the vast majority of
+	// languages, based on a list of plural forms used by gettext.
 
 	public class PluralEvaluator1_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32(0); } }
 	public class PluralEvaluator2_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n != 1)); } }
