@@ -52,6 +52,24 @@ namespace nettext
 		}
 
 		/// <summary>
+		/// Creates new instance and loads given stream.
+		/// </summary>
+		/// <param name="stream"></param>
+		public PoFile(Stream stream)
+		{
+			this.LoadFromStream(stream);
+		}
+
+		/// <summary>
+		/// Creates new instance and loads given text reader.
+		/// </summary>
+		/// <param name="reader"></param>
+		public PoFile(TextReader reader)
+		{
+			this.LoadFromReader(reader);
+		}
+
+		/// <summary>
 		/// Resets variables to defaults, in preparation for loading
 		/// a new file.
 		/// </summary>
