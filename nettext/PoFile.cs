@@ -118,7 +118,7 @@ namespace nettext
 				throw new ArgumentException("File is not a PO file.");
 
 			using (var sr = new StreamReader(filePath, Encoding.UTF8))
-				LoadFromReader(sr);
+				this.LoadFromReader(sr);
 		}
 
 		/// <summary>
