@@ -27,6 +27,8 @@ namespace nettext
 	/// </summary>
 	public class PoFile
 	{
+		private object _syncLock = new object();
+
 		private Dictionary<string, Message> _storage;
 		private Dictionary<string, string> _headers;
 
@@ -75,12 +77,15 @@ namespace nettext
 		/// </summary>
 		private void Init()
 		{
-			_storage = new Dictionary<string, Message>();
-			_headers = new Dictionary<string, string>();
+			lock (_syncLock)
+			{
+				_storage = new Dictionary<string, Message>();
+				_headers = new Dictionary<string, string>();
 
-			_nplurals = 2;
-			_plural = "(n != 1)";
-			_pluralEvaluator = new DefaultPluralEvaluator();
+				_nplurals = 2;
+				_plural = "(n != 1)";
+				_pluralEvaluator = new DefaultPluralEvaluator();
+			}
 		}
 
 		/// <summary>
@@ -91,8 +96,11 @@ namespace nettext
 		public string GetHeader(string name)
 		{
 			string result;
-			if (!_headers.TryGetValue(name, out result))
-				throw new MissingFieldException("Language header missing.");
+			lock (_syncLock)
+			{
+				if (!_headers.TryGetValue(name, out result))
+					throw new MissingFieldException("Language header missing.");
+			}
 
 			return result;
 		}
@@ -168,7 +176,7 @@ namespace nettext
 				// Empty line, initiate new message
 				if (string.IsNullOrEmpty(line))
 				{
-					Add(message);
+					this.Add(message);
 					message = new Message();
 					continue;
 				}
@@ -181,7 +189,8 @@ namespace nettext
 					type = BlockType.IdPlural;
 
 					// Create space for all plural forms
-					message.EnsureSpace(_nplurals);
+					lock (_syncLock)
+						message.EnsureSpace(_nplurals);
 				}
 				else if (line.StartsWith("msgid"))
 					type = BlockType.Id;
@@ -216,7 +225,7 @@ namespace nettext
 			}
 
 			// TextReader skips last empty line, add last message
-			Add(message);
+			this.Add(message);
 		}
 
 		/// <summary>
@@ -247,7 +256,8 @@ namespace nettext
 			if (message.Id == null || message.Str.All(a => string.IsNullOrEmpty(a)))
 				return;
 
-			_storage[message.Key] = message;
+			lock (_syncLock)
+				_storage[message.Key] = message;
 
 			// Load headers as soon as available, we need the plual forms.
 			if (message.Id == "")
@@ -255,8 +265,11 @@ namespace nettext
 				LoadHeaders(message.Str[0]);
 
 				// Load plural forms if header is given
-				if (_headers.ContainsKey("Plural-Forms"))
-					LoadPluralEvaluator(_headers["Plural-Forms"]);
+				lock (_syncLock)
+				{
+					if (_headers.ContainsKey("Plural-Forms"))
+						LoadPluralEvaluator(_headers["Plural-Forms"]);
+				}
 			}
 		}
 
@@ -279,7 +292,8 @@ namespace nettext
 					var key = line.Substring(0, start).Trim();
 					var val = line.Substring(start + 1).Trim();
 
-					_headers.Add(key, val);
+					lock (_syncLock)
+						_headers.Add(key, val);
 				}
 			}
 		}
@@ -298,54 +312,57 @@ namespace nettext
 				throw new ArgumentException("Invalid Plural-Forms value: " + pluralForms);
 
 			// Read number and rules
-			_nplurals = Convert.ToInt32(match.Groups["nplurals"].Value);
-			_plural = match.Groups["plural"].Value;
-
-			// Check for known evaluators
-			var knownEvaluator = DefaultPluralEvaluator.GetKnownEvaluator(pluralForms);
-			if (knownEvaluator != null)
+			lock (_syncLock)
 			{
-				_pluralEvaluator = knownEvaluator;
-				return;
-			}
+				_nplurals = Convert.ToInt32(match.Groups["nplurals"].Value);
+				_plural = match.Groups["plural"].Value;
 
-			// Create script
-			var script = @"
-				using System;
-				using nettext;
-
-				public class PluralEvaluator : IPluralEvaluator
+				// Check for known evaluators
+				var knownEvaluator = DefaultPluralEvaluator.GetKnownEvaluator(pluralForms);
+				if (knownEvaluator != null)
 				{
-					public int Eval(int n)
-					{
-						// A plural like `(n != 1)` would result in a bool
-						// in C#, use Convert to guarantee an int result.
-						return Convert.ToInt32(" + _plural + @");
-					}
+					_pluralEvaluator = knownEvaluator;
+					return;
 				}
-			";
 
-			// Prepare compiler
-			var compiler = new CSharpCodeProvider();
-			var parameters = new CompilerParameters();
-			parameters.ReferencedAssemblies.Add(typeof(IPluralEvaluator).Assembly.Location);
-			parameters.GenerateExecutable = false;
-			parameters.GenerateInMemory = true;
+				// Create script
+				var script = @"
+					using System;
+					using nettext;
 
-			// Compile, throw if compilation failed
-			var result = compiler.CompileAssemblyFromSource(parameters, script);
-			foreach (CompilerError err in result.Errors)
-				throw new FormatException("Failed to compile plural evaluator: " + err.ErrorText);
+					public class PluralEvaluator : IPluralEvaluator
+					{
+						public int Eval(int n)
+						{
+							// A plural like `(n != 1)` would result in a bool
+							// in C#, use Convert to guarantee an int result.
+							return Convert.ToInt32(" + _plural + @");
+						}
+					}
+				";
 
-			// Get type
-			var type = result.CompiledAssembly.GetType("PluralEvaluator");
-			if (type == null)
-				throw new TypeLoadException("Failed to generate plural evaluator, no PluralEvaluator.");
+				// Prepare compiler
+				var compiler = new CSharpCodeProvider();
+				var parameters = new CompilerParameters();
+				parameters.ReferencedAssemblies.Add(typeof(IPluralEvaluator).Assembly.Location);
+				parameters.GenerateExecutable = false;
+				parameters.GenerateInMemory = true;
 
-			// Instantiate evaluator
-			_pluralEvaluator = Activator.CreateInstance(type) as IPluralEvaluator;
-			if (_pluralEvaluator == null)
-				throw new TypeLoadException("Failed to generate plural evaluator, no IPluralEvaluator.");
+				// Compile, throw if compilation failed
+				var result = compiler.CompileAssemblyFromSource(parameters, script);
+				foreach (CompilerError err in result.Errors)
+					throw new FormatException("Failed to compile plural evaluator: " + err.ErrorText);
+
+				// Get type
+				var type = result.CompiledAssembly.GetType("PluralEvaluator");
+				if (type == null)
+					throw new TypeLoadException("Failed to generate plural evaluator, no PluralEvaluator.");
+
+				// Instantiate evaluator
+				_pluralEvaluator = Activator.CreateInstance(type) as IPluralEvaluator;
+				if (_pluralEvaluator == null)
+					throw new TypeLoadException("Failed to generate plural evaluator, no IPluralEvaluator.");
+			}
 		}
 
 		/// <summary>
@@ -357,8 +374,11 @@ namespace nettext
 		public string GetString(string id)
 		{
 			Message message;
-			if (!_storage.TryGetValue(id, out message) || string.IsNullOrEmpty(message.Str[0]))
-				return id;
+			lock (_syncLock)
+			{
+				if (!_storage.TryGetValue(id, out message) || string.IsNullOrEmpty(message.Str[0]))
+					return id;
+			}
 
 			return message.Str[0];
 		}
@@ -375,8 +395,11 @@ namespace nettext
 			var fullId = context + Message.ContextSeperator + id;
 
 			Message message;
-			if (!_storage.TryGetValue(fullId, out message) || string.IsNullOrEmpty(message.Str[0]))
-				return id;
+			lock (_syncLock)
+			{
+				if (!_storage.TryGetValue(fullId, out message) || string.IsNullOrEmpty(message.Str[0]))
+					return id;
+			}
 
 			return message.Str[0];
 		}
@@ -391,16 +414,19 @@ namespace nettext
 		/// <returns></returns>
 		public string GetPluralString(string id, string id_plural, int n)
 		{
-			var index = _pluralEvaluator.Eval(n);
-
-			Message message;
-			if (_storage.TryGetValue(id, out message))
+			lock (_syncLock)
 			{
-				if (!string.IsNullOrEmpty(message.Str[index]))
-					return message.Str[index];
-			}
+				var index = _pluralEvaluator.Eval(n);
 
-			return (n != 1 ? id_plural : id);
+				Message message;
+				if (_storage.TryGetValue(id, out message))
+				{
+					if (!string.IsNullOrEmpty(message.Str[index]))
+						return message.Str[index];
+				}
+
+				return (n != 1 ? id_plural : id);
+			}
 		}
 
 		/// <summary>
@@ -412,17 +438,20 @@ namespace nettext
 		/// <returns></returns>
 		public string GetParticularPluralString(string context, string id, string id_plural, int n)
 		{
-			var fullId = context + Message.ContextSeperator + id;
-			var index = _pluralEvaluator.Eval(n);
-
-			Message message;
-			if (_storage.TryGetValue(fullId, out message))
+			lock (_syncLock)
 			{
-				if (!string.IsNullOrEmpty(message.Str[index]))
-					return message.Str[index];
-			}
+				var fullId = context + Message.ContextSeperator + id;
+				var index = _pluralEvaluator.Eval(n);
 
-			return (n != 1 ? id_plural : id);
+				Message message;
+				if (_storage.TryGetValue(fullId, out message))
+				{
+					if (!string.IsNullOrEmpty(message.Str[index]))
+						return message.Str[index];
+				}
+
+				return (n != 1 ? id_plural : id);
+			}
 		}
 
 		/// <summary>
