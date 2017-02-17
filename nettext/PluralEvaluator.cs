@@ -81,6 +81,8 @@ namespace nettext
 
 	// These evaluators are the only ones needed for the vast majority of
 	// languages, based on a list of plural forms used by gettext.
+	// Providing these saves us from compiling the classes during run-time
+	// and allows nettext to be used where compilation isn't an option.
 
 	public class PluralEvaluator1_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32(0); } }
 	public class PluralEvaluator2_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n != 1)); } }
