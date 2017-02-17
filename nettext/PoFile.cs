@@ -29,6 +29,8 @@ namespace nettext
 	{
 		private object _syncLock = new object();
 
+		private FileSystemWatcher _watcher;
+
 		private Dictionary<string, Message> _storage;
 		private Dictionary<string, string> _headers;
 
@@ -49,8 +51,21 @@ namespace nettext
 		/// </summary>
 		/// <param name="filePath"></param>
 		public PoFile(string filePath)
+			: this(filePath, false)
+		{
+		}
+
+		/// <summary>
+		/// Creates new instance, loads given file, and starts watching
+		/// it to reload it if it changes.
+		/// </summary>
+		/// <param name="filePath"></param>
+		public PoFile(string filePath, bool liveReload)
 		{
 			this.LoadFromFile(filePath);
+
+			if (liveReload)
+				this.LoadOnChange(filePath);
 		}
 
 		/// <summary>
@@ -69,6 +84,39 @@ namespace nettext
 		public PoFile(TextReader reader)
 		{
 			this.LoadFromReader(reader);
+		}
+
+		/// <summary>
+		/// Starts watching file for changes and reloads it if necessary.
+		/// </summary>
+		/// <param name="filePath"></param>
+		private void LoadOnChange(string filePath)
+		{
+			var fullPath = Path.GetFullPath(filePath);
+			var dirPath = Path.GetDirectoryName(fullPath);
+			var fileName = Path.GetFileName(fullPath);
+
+			lock (_syncLock)
+			{
+				if (_watcher != null)
+					_watcher.Changed -= this.OnWatchedFileChanged;
+
+				_watcher = new FileSystemWatcher(dirPath, fileName);
+				_watcher.NotifyFilter = NotifyFilters.LastWrite;
+				_watcher.Changed += OnWatchedFileChanged;
+				_watcher.EnableRaisingEvents = true;
+			}
+		}
+
+		/// <summary>
+		/// Called when the watched file changes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OnWatchedFileChanged(object sender, FileSystemEventArgs e)
+		{
+			var filePath = e.FullPath;
+			this.LoadFromFile(filePath);
 		}
 
 		/// <summary>
