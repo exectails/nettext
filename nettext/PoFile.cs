@@ -39,6 +39,11 @@ namespace nettext
 		private IPluralEvaluator _pluralEvaluator;
 
 		/// <summary>
+		/// The time the messages were (re)loaded last.
+		/// </summary>
+		public DateTime LastLoad { get; private set; }
+
+		/// <summary>
 		/// Creates new instance.
 		/// </summary>
 		public PoFile()
@@ -274,6 +279,8 @@ namespace nettext
 
 			// TextReader skips last empty line, add last message
 			this.Add(message);
+
+			this.LastLoad = DateTime.Now;
 		}
 
 		/// <summary>
