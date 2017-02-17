@@ -44,6 +44,11 @@ namespace nettext
 		public DateTime LastLoad { get; private set; }
 
 		/// <summary>
+		/// Called when the file was reloaded after a change.
+		/// </summary>
+		public event Action Reload;
+
+		/// <summary>
 		/// Creates new instance.
 		/// </summary>
 		public PoFile()
@@ -122,6 +127,10 @@ namespace nettext
 		{
 			var filePath = e.FullPath;
 			this.LoadFromFile(filePath);
+
+			var ev = this.Reload;
+			if (ev != null)
+				ev();
 		}
 
 		/// <summary>
