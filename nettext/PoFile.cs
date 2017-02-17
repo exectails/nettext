@@ -299,9 +299,9 @@ namespace nettext
 		/// <returns></returns>
 		private static string Unescape(string str)
 		{
-			str = str.Replace("\\t", "\t");
-			str = str.Replace("\\r\\n", "\r\n");
-			str = str.Replace("\\n", "\n");
+			str = Regex.Replace(str, @"(^|[^\\])\\r", "$1\r");
+			str = Regex.Replace(str, @"(^|[^\\])\\n", "$1\n");
+			str = Regex.Replace(str, @"(^|[^\\])\\t", "$1\t");
 			str = str.Replace("\\\"", "\"");
 
 			return str;
