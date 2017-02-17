@@ -349,7 +349,7 @@ namespace nettext
 				while ((line = sr.ReadLine()) != null)
 				{
 					// Ignore empty lines
-					if (string.IsNullOrWhiteSpace(line))
+					if (IsNullOrWhiteSpace(line))
 						continue;
 
 					var start = line.IndexOf(":");
@@ -360,6 +360,26 @@ namespace nettext
 						_headers.Add(key, val);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Returns true if given string is null or consists of only
+		/// white space characters.
+		/// </summary>
+		/// <param name="str"></param>
+		/// <returns></returns>
+		public static bool IsNullOrWhiteSpace(string str)
+		{
+			if (str == null)
+				return true;
+
+			for (int i = 0; i < str.Length; ++i)
+			{
+				if (!Char.IsWhiteSpace(str[i]))
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>
