@@ -70,6 +70,7 @@ namespace nettext
 		/// it to reload it if it changes.
 		/// </summary>
 		/// <param name="filePath"></param>
+		/// <param name="liveReload"></param>
 		public PoFile(string filePath, bool liveReload)
 		{
 			this.LoadFromFile(filePath);
@@ -519,6 +520,8 @@ namespace nettext
 		/// </summary>
 		/// <param name="context"></param>
 		/// <param name="id"></param>
+		/// <param name="id_plural"></param>
+		/// <param name="n"></param>
 		/// <returns></returns>
 		public string GetParticularPluralString(string context, string id, string id_plural, int n)
 		{

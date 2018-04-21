@@ -79,11 +79,14 @@ namespace nettext
 		}
 	}
 
+
 	// These evaluators are the only ones needed for the vast majority of
 	// languages, based on a list of plural forms used by gettext.
 	// Providing these saves us from compiling the classes during run-time
 	// and allows nettext to be used where compilation isn't an option.
 
+
+#pragma warning disable CS1591  // Missing XML comment
 	public class PluralEvaluator1_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32(0); } }
 	public class PluralEvaluator2_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n != 1)); } }
 	public class PluralEvaluator2_1 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n % 10 == 1 && n % 100 != 11) ? 0 : 1); } }
@@ -102,4 +105,5 @@ namespace nettext
 	public class PluralEvaluator4_4 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n == 1) ? 0 : (n == 2) ? 1 : (n == 3) ? 2 : 3); } }
 	public class PluralEvaluator5_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4)); } }
 	public class PluralEvaluator6_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5)); } }
+#pragma warning restore CS1591
 }
