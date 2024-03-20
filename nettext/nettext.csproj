@@ -1,44 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyTitle>nettext</AssemblyTitle>
-    <Company>exec</Company>
-    <Product>nettext</Product>
-    <Copyright>Copyright © 2016 exec</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <Title>ExecTails.NetText</Title>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
-    <Authors>exec</Authors>
-    <Description>Localization library akin to gettext that works on PO files.</Description>
-    <PackageProjectUrl>https://github.com/exectails/nettext</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/exectails/nettext</RepositoryUrl>
-    <PackageTags>localization</PackageTags>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DocumentationFile>bin\Debug\nettext.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <DocumentationFile>bin\Release\nettext.xml</DocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CodingSeb.ExpressionEvaluator" Version="1.4.40" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputType>Library</OutputType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AssemblyTitle>nettext</AssemblyTitle>
+		<Company>exec</Company>
+		<Product>nettext</Product>
+		<Copyright>Copyright © 2016 exec</Copyright>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<Title>$(AssemblyName)</Title>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>1.0.0</Version>
+		<Authors>exec</Authors>
+		<Description>Localization library akin to gettext that works on PO files.</Description>
+		<PackageProjectUrl>https://github.com/exectails/nettext</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/exectails/nettext</RepositoryUrl>
+		<PackageTags>localization</PackageTags>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageId>ExecTails.NetText</PackageId>
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<DebugType>none</DebugType>
+		<DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CodingSeb.ExpressionEvaluator" Version="1.4.40" />
+	</ItemGroup>
 </Project>
