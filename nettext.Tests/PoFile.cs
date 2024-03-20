@@ -1,17 +1,4 @@
-﻿// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-using Xunit;
+﻿using Xunit;
 
 namespace nettext.Tests
 {
@@ -21,7 +8,7 @@ namespace nettext.Tests
 		public void ReadTestDe()
 		{
 			var po = new PoFile();
-			po.LoadFromFile("../../Files/de.po");
+			po.LoadFromFile("Files/de.po");
 
 			Assert.Equal("Datei", po.GetString("File"));
 			Assert.Equal("Datei", po.GetParticularString("some context", "File"));
@@ -34,7 +21,7 @@ namespace nettext.Tests
 		public void ReadTestRu()
 		{
 			var po = new PoFile();
-			po.LoadFromFile("../../Files/ru.po");
+			po.LoadFromFile("Files/ru.po");
 
 			Assert.Equal("Файл", po.GetString("File"));
 			Assert.Equal("Файл", po.GetParticularString("some context", "File"));
@@ -48,7 +35,7 @@ namespace nettext.Tests
 		public void ReadTestPl()
 		{
 			var po = new PoFile();
-			po.LoadFromFile("../../Files/pl.po");
+			po.LoadFromFile("Files/pl.po");
 
 			Assert.Equal("plik", po.GetString("File"));
 			Assert.Equal("plik", po.GetParticularString("some context", "File"));
@@ -62,7 +49,7 @@ namespace nettext.Tests
 		public void ReadTestDeUntranslated()
 		{
 			var po = new PoFile();
-			po.LoadFromFile("../../Files/de-untranslated.po");
+			po.LoadFromFile("Files/de-untranslated.po");
 
 			Assert.Equal("File", po.GetString("File"));
 			Assert.Equal("File", po.GetParticularString("some context", "File"));
@@ -75,7 +62,7 @@ namespace nettext.Tests
 		public void ReadTestDePartially()
 		{
 			var po = new PoFile();
-			po.LoadFromFile("../../Files/de-partially.po");
+			po.LoadFromFile("Files/de-partially.po");
 
 			Assert.Equal("Datei", po.GetString("File"));
 			Assert.Equal("File", po.GetParticularString("some context", "File"));
@@ -89,7 +76,7 @@ namespace nettext.Tests
 		public void ReadTestPlPartially()
 		{
 			var po = new PoFile();
-			po.LoadFromFile("../../Files/pl-partially.po");
+			po.LoadFromFile("Files/pl-partially.po");
 
 			Assert.Equal("plik", po.GetString("File"));
 			Assert.Equal("File", po.GetParticularString("some context", "File"));
@@ -105,7 +92,7 @@ namespace nettext.Tests
 		public void ReadTestDeNewLine()
 		{
 			var po = new PoFile();
-			po.LoadFromFile("../../Files/de.po");
+			po.LoadFromFile("Files/de.po");
 
 			Assert.Equal("Neue\nZeile 1", po.GetString("New\nLine 1"));
 			Assert.Equal("Neue\nZeile 2", po.GetString("New\nLine 2"));
@@ -116,13 +103,13 @@ namespace nettext.Tests
 		{
 			var po = new PoFile();
 
-			po.LoadFromFile("../../Files/de.po");
+			po.LoadFromFile("Files/de.po");
 			Assert.Equal("de", po.GetHeader("Language"));
 
-			po.LoadFromFile("../../Files/ru.po");
+			po.LoadFromFile("Files/ru.po");
 			Assert.Equal("ru", po.GetHeader("Language"));
 
-			po.LoadFromFile("../../Files/pl.po");
+			po.LoadFromFile("Files/pl.po");
 			Assert.Equal("pl", po.GetHeader("Language"));
 		}
 	}

@@ -1,17 +1,5 @@
-﻿// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-using System;
+﻿using System;
+using CodingSeb.ExpressionEvaluator;
 
 namespace nettext
 {
@@ -85,7 +73,6 @@ namespace nettext
 	// Providing these saves us from compiling the classes during run-time
 	// and allows nettext to be used where compilation isn't an option.
 
-
 #pragma warning disable CS1591  // Missing XML comment
 	public class PluralEvaluator1_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32(0); } }
 	public class PluralEvaluator2_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n != 1)); } }
@@ -106,4 +93,28 @@ namespace nettext
 	public class PluralEvaluator5_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4)); } }
 	public class PluralEvaluator6_0 : IPluralEvaluator { public int Eval(int n) { return Convert.ToInt32((n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5)); } }
 #pragma warning restore CS1591
+
+	internal class DynamicPluralEvaluator : IPluralEvaluator
+	{
+		private readonly ExpressionEvaluator _evaluator = new ExpressionEvaluator();
+		private string _plural;
+
+		public DynamicPluralEvaluator(string pluralForms)
+		{
+			var index = pluralForms.IndexOf("plural=");
+			if (index == -1)
+				throw new ArgumentException("Invalid plural forms: " + pluralForms);
+
+			var plural = pluralForms.Substring(index + 7).Trim().TrimEnd(';');
+			_plural = plural;
+		}
+
+		public int Eval(int n)
+		{
+			_evaluator.Variables["n"] = n;
+			var result = _evaluator.Evaluate(_plural);
+
+			return Convert.ToInt32(result);
+		}
+	}
 }

@@ -1,17 +1,4 @@
-﻿// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-using Microsoft.CSharp;
+﻿using Microsoft.CSharp;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -410,43 +397,8 @@ namespace nettext
 					return;
 				}
 
-				// Create script
-				var script = @"
-					using System;
-					using nettext;
-
-					public class PluralEvaluator : IPluralEvaluator
-					{
-						public int Eval(int n)
-						{
-							// A plural like `(n != 1)` would result in a bool
-							// in C#, use Convert to guarantee an int result.
-							return Convert.ToInt32(" + _plural + @");
-						}
-					}
-				";
-
-				// Prepare compiler
-				var compiler = new CSharpCodeProvider();
-				var parameters = new CompilerParameters();
-				parameters.ReferencedAssemblies.Add(typeof(IPluralEvaluator).Assembly.Location);
-				parameters.GenerateExecutable = false;
-				parameters.GenerateInMemory = true;
-
-				// Compile, throw if compilation failed
-				var result = compiler.CompileAssemblyFromSource(parameters, script);
-				foreach (CompilerError err in result.Errors)
-					throw new FormatException("Failed to compile plural evaluator: " + err.ErrorText);
-
-				// Get type
-				var type = result.CompiledAssembly.GetType("PluralEvaluator");
-				if (type == null)
-					throw new TypeLoadException("Failed to generate plural evaluator, no PluralEvaluator.");
-
-				// Instantiate evaluator
-				_pluralEvaluator = Activator.CreateInstance(type) as IPluralEvaluator;
-				if (_pluralEvaluator == null)
-					throw new TypeLoadException("Failed to generate plural evaluator, no IPluralEvaluator.");
+				// Use a dynamic evaluator if no known evaluator is available
+				_pluralEvaluator = new DynamicPluralEvaluator(pluralForms);
 			}
 		}
 

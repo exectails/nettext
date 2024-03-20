@@ -1,11 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nettext", "nettext\nettext.csproj", "{AF3ECA49-D8EF-4F6F-AA93-A68E03C16E41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nettext", "nettext\nettext.csproj", "{AF3ECA49-D8EF-4F6F-AA93-A68E03C16E41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nettext.Tests", "nettext.Tests\nettext.Tests.csproj", "{888E4099-7CA0-4B82-BB3E-699DF6E7F269}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nettext.Tests", "nettext.Tests\nettext.Tests.csproj", "{888E4099-7CA0-4B82-BB3E-699DF6E7F269}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
